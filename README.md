@@ -1,2 +1,5 @@
 # jackcompiler-rust
-This is a repository for Compilers Class. 
+
+## Informations
+- Name: Lucas Martins Campos Matos
+- Lenguage: Rust
