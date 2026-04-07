@@ -4,7 +4,7 @@
 // Estruturas usadas no código:
 //  - enum, impl e struct: rust diferente do python e java que podemos implementar as funções,
 //    dados e estruturas dentro do "class Keyword". No rust temos uma estrutura para
-//    cada uma dessas definições. enum -> dados, struct -> estrutura e
+//    cada uma dessas definições. enum -> possíveis tipos de dados, struct -> estrutura específica e
 //    impl -> comportamentos (funções). 
 //  - "derive": macro para criação de classes padrões, funciona como o "dataclass"
 //    no python so que precisa definir especificamente as permições como no caso
