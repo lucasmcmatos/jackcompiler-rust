@@ -14,8 +14,8 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     let input_path = if args.len() < 2 {
-        println!("Nenhum caminho informado, usando padrão: testes/Square");
-        Path::new("testes/Square")
+        println!("Nenhum caminho informado, usando padrão: testes/Square/Inputs");
+        Path::new("tests/Square/Inputs")
     } else {
         Path::new(&args[1])
     };
@@ -49,7 +49,22 @@ fn process_file(path: &Path) {
 
     let output = generate_xml(tokens);
 
-    let output_path = path.with_extension("T.xml");
+    // 🔹 Define diretório de saída
+    let output_dir = path
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .join("Outputs");
+
+    // 🔹 Garante que a pasta Outputs existe
+    fs::create_dir_all(&output_dir)
+        .expect("Erro ao criar diretório Outputs");
+
+    // 🔹 Nome do arquivo (Main, Square, etc.)
+    let file_name = path.file_stem().unwrap().to_str().unwrap();
+
+    let output_path = output_dir.join(format!("{}T.xml", file_name));
 
     fs::write(output_path, output)
         .expect("Erro ao escrever arquivo de saída");

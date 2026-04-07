@@ -82,6 +82,10 @@ pub enum TokenType {
     StringConstant,
 }
 
+// O código esta gerando um warning por não uso do "line", mas na verdade eu 
+// estou sindo usando mas não como "Token.line" mas sim como "self.line" dessa 
+// forma vou apenas ignorar.
+#[allow(dead_code)] 
 #[derive(Debug, Clone)]
 pub struct Token {
     pub token_type: TokenType,
