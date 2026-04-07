@@ -1,21 +1,23 @@
 // Arquivo estrutural do projeto, responsável por definir a estrutura e tipagem
 // dos tokens.
 
-// Substituição das estruturas usadas no código python exemplo
-//  - Enum (python) -> enum (rust): O rust tem uma estrutura nativa que realiza 
-//    a função de "representar um conjunto fixo de valores";
-//  - auto() (python): Na estrutura enum do rust nunva trabalharemos com valores
-//    numéricos internos, dessa forma, não a necessidade de usar uma estrutura 
-//    semelhante a função no python;
-//  - dataclass (python) -> struct + derive (rust): Para replicar o comportamento
-//    da estrutura em python podemos usar as duas estruturas para o projeto.
-
-// Estruturas usadas:
-// - derive: macro para criação de padrões com interfaces definidas assim como os
-//   dataclass em python. É necessário ser setado com as configurações no caso foi
-//   usado "Debug" ( permite impressão em console com formatadores), "Clone" 
-//   ( permite copia das instâcias ) e "PartialEq" (permite comparação com operadores
-//   como ==, !=...)
+// Estruturas usadas no código:
+//  - enum, impl e struct: rust diferente do python e java que podemos implementar as funções,
+//    dados e estruturas dentro do "class Keyword". No rust temos uma estrutura para
+//    cada uma dessas definições. enum -> dados, struct -> estrutura e
+//    impl -> comportamentos (funções). 
+//  - "derive": macro para criação de classes padrões, funciona como o "dataclass"
+//    no python so que precisa definir especificamente as permições como no caso
+//    "Debug" (permite impressão no console), "Clone" (permite instância da classe)
+//    e "ParitalEq" (permite operadores de comparação entre as insTâncias).
+//  - Option: Basicamente define um retorno dentro de alguma estrutura ja definida
+//    no caso a estrura self refere-se ao Keyword.
+//  - Some(): É a forma de retornar algum valor, no python isso é nativo basta 
+//    basta retornar o valor. No rust tem que definir que vai retornar um valor,
+//    basicamente esta dizendo "retorna um valor, este é o valor" (o contrário seria
+//    apenas "None").
+//  - match: essa estrutura basicamente faz uma verificação se alguma variável é 
+//    igual ao valor definido. 
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Keyword {
