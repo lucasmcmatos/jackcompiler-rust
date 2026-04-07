@@ -20,11 +20,15 @@ fn main() {
         Path::new(&args[1])
     };
 
+    println!("Compilando arquivos...");
+
     if input_path.is_dir() {
         process_directory(input_path);
     } else {
         process_file(input_path);
     }
+
+    println!("Arquivos compilados! Verifique a pasta 'tests/Square/Outputs' para validar.", )
 }
 
 fn process_directory(dir: &Path) {

@@ -1,1 +1,0 @@
-/home/dunas-tech/learning/rust/jackcompiler-rust/jack-lexical-analyzer/target/debug/jack-lexical-analyzer: /home/dunas-tech/learning/rust/jackcompiler-rust/jack-lexical-analyzer/src/main.rs /home/dunas-tech/learning/rust/jackcompiler-rust/jack-lexical-analyzer/src/token.rs /home/dunas-tech/learning/rust/jackcompiler-rust/jack-lexical-analyzer/src/tokenizer.rs
