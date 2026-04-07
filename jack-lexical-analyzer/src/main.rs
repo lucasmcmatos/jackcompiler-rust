@@ -13,12 +13,12 @@ use tokenizer::Tokenizer;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() < 2 {
-        eprintln!("Uso: cargo run <arquivo.jack ou diretório>");
-        return;
-    }
-
-    let input_path = Path::new(&args[1]);
+    let input_path = if args.len() < 2 {
+        println!("Nenhum caminho informado, usando padrão: testes/Square");
+        Path::new("testes/Square")
+    } else {
+        Path::new(&args[1])
+    };
 
     if input_path.is_dir() {
         process_directory(input_path);
