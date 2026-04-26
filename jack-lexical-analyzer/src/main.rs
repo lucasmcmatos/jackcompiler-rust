@@ -3,32 +3,39 @@
 
 use std::env;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 mod token;
 mod tokenizer;
 
 use tokenizer::Tokenizer;
 
+fn repository_root() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("Erro ao encontrar a raiz do repositório!")
+        .to_path_buf()
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
     let input_path = if args.len() < 2 {
-        println!("Nenhum caminho informado, usando padrão: testes/Square/Inputs");
-        Path::new("tests/Square/Inputs")
+        println!("Nenhum caminho informado, usando padrão: square-tests/input");
+        repository_root().join("square-tests/input")
     } else {
-        Path::new(&args[1])
+        PathBuf::from(&args[1])
     };
 
     println!("Compilando arquivos...");
 
     if input_path.is_dir() {
-        process_directory(input_path);
+        process_directory(&input_path);
     } else {
-        process_file(input_path);
+        process_file(&input_path);
     }
 
-    println!("Arquivos compilados! Verifique a pasta 'tests/Square/Outputs' para validar.", )
+    println!("Arquivos compilados! Verifique a pasta 'square-tests/output' para validar.", )
 }
 
 fn process_directory(dir: &Path) {
@@ -54,12 +61,8 @@ fn process_file(path: &Path) {
     let output = generate_xml(tokens);
 
     // 🔹 Define diretório de saída
-    let output_dir = path
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("Outputs");
+    let output_dir = repository_root().join("square-tests/output");
+
 
     // 🔹 Garante que a pasta Outputs existe
     fs::create_dir_all(&output_dir)
