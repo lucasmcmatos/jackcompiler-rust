@@ -1,5 +1,6 @@
 use std::path::Path;
 
+#[allow(dead_code)]
 mod parser;
 #[allow(dead_code)]
 mod token;
