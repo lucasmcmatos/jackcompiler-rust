@@ -186,9 +186,23 @@ impl Parser {
         }
     }
 
-    // As funções abaixo serão implementadas nas próximas etapas.
+    // letStatement: 'let' varName ('[' expression ']')? '=' expression ';'
     fn compile_let(&mut self) {
-        panic!("letStatement ainda não implementado");
+        self.writer.open_tag("letStatement");
+
+        self.consume_keyword_and_write(Keyword::Let);
+        self.consume_identifier_and_write();
+
+        if self.match_symbol_and_write('[') {
+            self.compile_expression();
+            self.consume_symbol_and_write(']');
+        }
+
+        self.consume_symbol_and_write('=');
+        self.compile_expression();
+        self.consume_symbol_and_write(';');
+
+        self.writer.close_tag("letStatement");
     }
 
     fn compile_if(&mut self) {
@@ -199,12 +213,52 @@ impl Parser {
         panic!("whileStatement ainda não implementado");
     }
 
+    // doStatement: 'do' subroutineCall ';'
     fn compile_do(&mut self) {
-        panic!("doStatement ainda não implementado");
+        self.writer.open_tag("doStatement");
+
+        self.consume_keyword_and_write(Keyword::Do);
+        self.compile_subroutine_call();
+        self.consume_symbol_and_write(';');
+
+        self.writer.close_tag("doStatement");
     }
 
+    // returnStatement: 'return' expression? ';'
     fn compile_return(&mut self) {
-        panic!("returnStatement ainda não implementado");
+        self.writer.open_tag("returnStatement");
+
+        self.consume_keyword_and_write(Keyword::Return);
+
+        if !self.check_symbol(';') {
+            self.compile_expression();
+        }
+
+        self.consume_symbol_and_write(';');
+
+        self.writer.close_tag("returnStatement");
+    }
+
+    fn compile_subroutine_call(&mut self) {
+        self.consume_identifier_and_write();
+
+        if self.match_symbol_and_write('.') {
+            self.consume_identifier_and_write();
+        }
+
+        self.consume_symbol_and_write('(');
+        self.compile_expression_list();
+        self.consume_symbol_and_write(')');
+    }
+
+    // expression e expressionList serão implementadas na etapa de expressões.
+    fn compile_expression(&mut self) {
+        panic!("expression ainda não implementada");
+    }
+
+    fn compile_expression_list(&mut self) {
+        self.writer.open_tag("expressionList");
+        self.writer.close_tag("expressionList");
     }
 
     // type: 'int' | 'char' | 'boolean' | className
