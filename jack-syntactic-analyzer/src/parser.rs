@@ -37,6 +37,59 @@ impl Parser {
         self.writer.current_indent()
     }
 
+    // Regra inicial da gramática Jack:
+    // class: 'class' className '{' classVarDec* subroutineDec* '}'
+    fn compile_class(&mut self) {
+        self.writer.open_tag("class");
+
+        self.consume_keyword_and_write(Keyword::Class);
+        self.consume_identifier_and_write();
+        self.consume_symbol_and_write('{');
+
+        while self.check_keyword(Keyword::Static) || self.check_keyword(Keyword::Field) {
+            self.compile_class_var_dec();
+        }
+
+        // O loop de subroutineDec será adicionado na próxima etapa.
+
+        self.consume_symbol_and_write('}');
+        self.writer.close_tag("class");
+    }
+
+    // classVarDec: ('static' | 'field') type varName (',' varName)* ';'
+    fn compile_class_var_dec(&mut self) {
+        self.writer.open_tag("classVarDec");
+
+        if self.check_keyword(Keyword::Static) {
+            self.consume_keyword_and_write(Keyword::Static);
+        } else {
+            self.consume_keyword_and_write(Keyword::Field);
+        }
+
+        self.compile_type();
+        self.consume_identifier_and_write();
+
+        while self.match_symbol_and_write(',') {
+            self.consume_identifier_and_write();
+        }
+
+        self.consume_symbol_and_write(';');
+        self.writer.close_tag("classVarDec");
+    }
+
+    // type: 'int' | 'char' | 'boolean' | className
+    fn compile_type(&mut self) {
+        if self.check_keyword(Keyword::Int) {
+            self.consume_keyword_and_write(Keyword::Int);
+        } else if self.check_keyword(Keyword::Char) {
+            self.consume_keyword_and_write(Keyword::Char);
+        } else if self.check_keyword(Keyword::Boolean) {
+            self.consume_keyword_and_write(Keyword::Boolean);
+        } else {
+            self.consume_identifier_and_write();
+        }
+    }
+
     fn is_at_end(&self) -> bool {
         self.current >= self.tokens.len()
     }
@@ -98,6 +151,16 @@ impl Parser {
         false
     }
 
+    fn match_symbol_and_write(&mut self, symbol: char) -> bool {
+        if self.check_symbol(symbol) {
+            let token = self.advance().unwrap();
+            self.writer.write_token(&token);
+            return true;
+        }
+
+        false
+    }
+
     fn consume_keyword(&mut self, keyword: Keyword) -> Token {
         if self.check_keyword(keyword.clone()) {
             return self.advance().unwrap();
@@ -120,6 +183,21 @@ impl Parser {
         }
 
         self.syntax_error("identifier")
+    }
+
+    fn consume_keyword_and_write(&mut self, keyword: Keyword) {
+        let token = self.consume_keyword(keyword);
+        self.writer.write_token(&token);
+    }
+
+    fn consume_symbol_and_write(&mut self, symbol: char) {
+        let token = self.consume_symbol(symbol);
+        self.writer.write_token(&token);
+    }
+
+    fn consume_identifier_and_write(&mut self) {
+        let token = self.consume_identifier();
+        self.writer.write_token(&token);
     }
 
     fn syntax_error(&self, expected: &str) -> ! {
