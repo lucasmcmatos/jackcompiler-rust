@@ -2,12 +2,12 @@
 // A estrutura Parser será responsável por consumir tokens e gerar a árvore XML.
 
 use crate::token::{Keyword, Token, TokenType};
+use crate::xml_writer::XmlWriter;
 
 pub struct Parser {
     tokens: Vec<Token>,
     current: usize,
-    output: String,
-    indent: usize,
+    writer: XmlWriter,
 }
 
 impl Parser {
@@ -15,15 +15,14 @@ impl Parser {
         Self {
             tokens,
             current: 0,
-            output: String::new(),
-            indent: 0,
+            writer: XmlWriter::new(),
         }
     }
 
     // Ponto de entrada do parser. Nas próximas etapas, este método chamará
     // compile_class(), que representa a regra inicial da gramática Jack.
     pub fn parse(&mut self) -> String {
-        self.output.clone()
+        self.writer.content().to_string()
     }
 
     pub fn token_count(&self) -> usize {
@@ -35,7 +34,7 @@ impl Parser {
     }
 
     pub fn current_indent(&self) -> usize {
-        self.indent
+        self.writer.current_indent()
     }
 
     fn is_at_end(&self) -> bool {

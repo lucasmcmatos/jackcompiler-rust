@@ -5,6 +5,8 @@ mod parser;
 #[allow(dead_code)]
 mod token;
 mod token_reader;
+#[allow(dead_code)]
+mod xml_writer;
 
 fn main() {
     let token_path = Path::new("../square-tests/output/MainT.xml");
