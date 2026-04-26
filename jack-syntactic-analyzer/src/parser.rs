@@ -50,7 +50,9 @@ impl Parser {
             self.compile_class_var_dec();
         }
 
-        // O loop de subroutineDec será adicionado na próxima etapa.
+        while self.is_subroutine_dec() {
+            self.compile_subroutine_dec();
+        }
 
         self.consume_symbol_and_write('}');
         self.writer.close_tag("class");
@@ -75,6 +77,52 @@ impl Parser {
 
         self.consume_symbol_and_write(';');
         self.writer.close_tag("classVarDec");
+    }
+
+    // subroutineDec:
+    // ('constructor' | 'function' | 'method') ('void' | type)
+    // subroutineName '(' parameterList ')' subroutineBody
+    fn compile_subroutine_dec(&mut self) {
+        self.writer.open_tag("subroutineDec");
+
+        if self.check_keyword(Keyword::Constructor) {
+            self.consume_keyword_and_write(Keyword::Constructor);
+        } else if self.check_keyword(Keyword::Function) {
+            self.consume_keyword_and_write(Keyword::Function);
+        } else {
+            self.consume_keyword_and_write(Keyword::Method);
+        }
+
+        self.compile_return_type();
+        self.consume_identifier_and_write();
+        self.consume_symbol_and_write('(');
+        self.compile_parameter_list();
+        self.consume_symbol_and_write(')');
+        self.compile_subroutine_body();
+
+        self.writer.close_tag("subroutineDec");
+    }
+
+    fn compile_return_type(&mut self) {
+        if self.check_keyword(Keyword::Void) {
+            self.consume_keyword_and_write(Keyword::Void);
+        } else {
+            self.compile_type();
+        }
+    }
+
+    // Esta função será completada na próxima etapa.
+    fn compile_parameter_list(&mut self) {
+        self.writer.open_tag("parameterList");
+        self.writer.close_tag("parameterList");
+    }
+
+    // Esta função será completada com varDec e statements na próxima etapa.
+    fn compile_subroutine_body(&mut self) {
+        self.writer.open_tag("subroutineBody");
+        self.consume_symbol_and_write('{');
+        self.consume_symbol_and_write('}');
+        self.writer.close_tag("subroutineBody");
     }
 
     // type: 'int' | 'char' | 'boolean' | className
@@ -131,6 +179,12 @@ impl Parser {
 
     fn check_identifier(&self) -> bool {
         self.check_token_type(&TokenType::Identifier)
+    }
+
+    fn is_subroutine_dec(&self) -> bool {
+        self.check_keyword(Keyword::Constructor)
+            || self.check_keyword(Keyword::Function)
+            || self.check_keyword(Keyword::Method)
     }
 
     fn match_keyword(&mut self, keyword: Keyword) -> bool {
