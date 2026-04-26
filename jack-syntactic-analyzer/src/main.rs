@@ -2,12 +2,9 @@ use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-#[allow(dead_code)]
 mod parser;
-#[allow(dead_code)]
 mod token;
 mod token_reader;
-#[allow(dead_code)]
 mod xml_writer;
 
 fn main() {

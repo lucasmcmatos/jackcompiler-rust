@@ -104,15 +104,4 @@ impl Token {
         }
     }
 
-    pub fn is_keyword(&self, keyword: Keyword) -> bool {
-        self.token_type == TokenType::Keyword(keyword)
-    }
-
-    pub fn is_symbol(&self, symbol: char) -> bool {
-        self.token_type == TokenType::Symbol(symbol)
-    }
-
-    pub fn is_identifier(&self) -> bool {
-        self.token_type == TokenType::Identifier
-    }
 }

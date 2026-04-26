@@ -44,10 +44,6 @@ impl XmlWriter {
         &self.output
     }
 
-    pub fn current_indent(&self) -> usize {
-        self.indent
-    }
-
     fn write_indent(&mut self) {
         self.output.push_str(&"  ".repeat(self.indent));
     }

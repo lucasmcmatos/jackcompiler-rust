@@ -31,18 +31,6 @@ impl Parser {
         self.writer.content().to_string()
     }
 
-    pub fn token_count(&self) -> usize {
-        self.tokens.len()
-    }
-
-    pub fn current_position(&self) -> usize {
-        self.current
-    }
-
-    pub fn current_indent(&self) -> usize {
-        self.writer.current_indent()
-    }
-
     // Regra inicial da gramática Jack:
     // class: 'class' className '{' classVarDec* subroutineDec* '}'
     fn compile_class(&mut self) {
@@ -454,24 +442,6 @@ impl Parser {
             || self.check_keyword(Keyword::False)
             || self.check_keyword(Keyword::Null)
             || self.check_keyword(Keyword::This)
-    }
-
-    fn match_keyword(&mut self, keyword: Keyword) -> bool {
-        if self.check_keyword(keyword) {
-            self.advance();
-            return true;
-        }
-
-        false
-    }
-
-    fn match_symbol(&mut self, symbol: char) -> bool {
-        if self.check_symbol(symbol) {
-            self.advance();
-            return true;
-        }
-
-        false
     }
 
     fn match_symbol_and_write(&mut self, symbol: char) -> bool {
