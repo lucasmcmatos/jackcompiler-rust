@@ -206,11 +206,39 @@ impl Parser {
     }
 
     fn compile_if(&mut self) {
-        panic!("ifStatement ainda não implementado");
+        self.writer.open_tag("ifStatement");
+
+        self.consume_keyword_and_write(Keyword::If);
+        self.consume_symbol_and_write('(');
+        self.compile_expression();
+        self.consume_symbol_and_write(')');
+        self.consume_symbol_and_write('{');
+        self.compile_statements();
+        self.consume_symbol_and_write('}');
+
+        if self.check_keyword(Keyword::Else) {
+            self.consume_keyword_and_write(Keyword::Else);
+            self.consume_symbol_and_write('{');
+            self.compile_statements();
+            self.consume_symbol_and_write('}');
+        }
+
+        self.writer.close_tag("ifStatement");
     }
 
+    // whileStatement: 'while' '(' expression ')' '{' statements '}'
     fn compile_while(&mut self) {
-        panic!("whileStatement ainda não implementado");
+        self.writer.open_tag("whileStatement");
+
+        self.consume_keyword_and_write(Keyword::While);
+        self.consume_symbol_and_write('(');
+        self.compile_expression();
+        self.consume_symbol_and_write(')');
+        self.consume_symbol_and_write('{');
+        self.compile_statements();
+        self.consume_symbol_and_write('}');
+
+        self.writer.close_tag("whileStatement");
     }
 
     // doStatement: 'do' subroutineCall ';'
