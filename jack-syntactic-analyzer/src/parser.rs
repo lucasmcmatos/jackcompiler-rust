@@ -279,14 +279,69 @@ impl Parser {
         self.consume_symbol_and_write(')');
     }
 
-    // expression e expressionList serão implementadas na etapa de expressões.
+    // expression: term (op term)*
     fn compile_expression(&mut self) {
-        panic!("expression ainda não implementada");
+        self.writer.open_tag("expression");
+
+        self.compile_term();
+
+        while self.is_op() {
+            let token = self.advance().unwrap();
+            self.writer.write_token(&token);
+            self.compile_term();
+        }
+
+        self.writer.close_tag("expression");
     }
 
+    // expressionList: (expression (',' expression)*)?
     fn compile_expression_list(&mut self) {
         self.writer.open_tag("expressionList");
+
+        if !self.check_symbol(')') {
+            self.compile_expression();
+
+            while self.match_symbol_and_write(',') {
+                self.compile_expression();
+            }
+        }
+
         self.writer.close_tag("expressionList");
+    }
+
+    // term cobre constantes, variáveis, chamadas, expressões entre parênteses e operadores unários.
+    fn compile_term(&mut self) {
+        self.writer.open_tag("term");
+
+        if self.check_token_type(&TokenType::IntegerConstant) {
+            self.consume_token_type_and_write(TokenType::IntegerConstant);
+        } else if self.check_token_type(&TokenType::StringConstant) {
+            self.consume_token_type_and_write(TokenType::StringConstant);
+        } else if self.is_keyword_constant() {
+            self.consume_current_and_write();
+        } else if self.check_symbol('(') {
+            self.consume_symbol_and_write('(');
+            self.compile_expression();
+            self.consume_symbol_and_write(')');
+        } else if self.is_unary_op() {
+            self.consume_current_and_write();
+            self.compile_term();
+        } else if self.check_identifier() {
+            if self.check_next_symbol('[') {
+                self.consume_identifier_and_write();
+                self.consume_symbol_and_write('[');
+                self.compile_expression();
+                self.consume_symbol_and_write(']');
+            } else if self.check_next_symbol('(') || self.check_next_symbol('.') {
+                self.compile_subroutine_call();
+            } else {
+                self.consume_identifier_and_write();
+            }
+        } else {
+            self.syntax_error("term");
+        }
+
+        self.writer.close_tag("term");
     }
 
     // type: 'int' | 'char' | 'boolean' | className
@@ -341,6 +396,13 @@ impl Parser {
         self.check_token_type(&TokenType::Symbol(symbol))
     }
 
+    fn check_next_symbol(&self, symbol: char) -> bool {
+        match self.tokens.get(self.current + 1) {
+            Some(token) => token.token_type == TokenType::Symbol(symbol),
+            None => false,
+        }
+    }
+
     fn check_identifier(&self) -> bool {
         self.check_token_type(&TokenType::Identifier)
     }
@@ -357,6 +419,35 @@ impl Parser {
             || self.check_keyword(Keyword::While)
             || self.check_keyword(Keyword::Do)
             || self.check_keyword(Keyword::Return)
+    }
+
+    fn is_op(&self) -> bool {
+        match self.peek() {
+            Some(token) => matches!(
+                token.token_type,
+                TokenType::Symbol('+')
+                    | TokenType::Symbol('-')
+                    | TokenType::Symbol('*')
+                    | TokenType::Symbol('/')
+                    | TokenType::Symbol('&')
+                    | TokenType::Symbol('|')
+                    | TokenType::Symbol('<')
+                    | TokenType::Symbol('>')
+                    | TokenType::Symbol('=')
+            ),
+            None => false,
+        }
+    }
+
+    fn is_unary_op(&self) -> bool {
+        self.check_symbol('-') || self.check_symbol('~')
+    }
+
+    fn is_keyword_constant(&self) -> bool {
+        self.check_keyword(Keyword::True)
+            || self.check_keyword(Keyword::False)
+            || self.check_keyword(Keyword::Null)
+            || self.check_keyword(Keyword::This)
     }
 
     fn match_keyword(&mut self, keyword: Keyword) -> bool {
@@ -409,6 +500,20 @@ impl Parser {
         }
 
         self.syntax_error("identifier")
+    }
+
+    fn consume_token_type_and_write(&mut self, token_type: TokenType) {
+        if self.check_token_type(&token_type) {
+            self.consume_current_and_write();
+            return;
+        }
+
+        self.syntax_error(token_type.xml_category())
+    }
+
+    fn consume_current_and_write(&mut self) {
+        let token = self.advance().unwrap();
+        self.writer.write_token(&token);
     }
 
     fn consume_keyword_and_write(&mut self, keyword: Keyword) {
