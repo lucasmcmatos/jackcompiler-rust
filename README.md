@@ -46,6 +46,18 @@ jackcompiler-rust/
   square-validation/         # Arquivos oficiais de referência
 ```
 
+## Decisão de organização dos módulos
+
+Os analisadores foram mantidos em projetos Cargo separados porque esta unidade do curso está sendo desenvolvida de forma incremental: primeiro o analisador léxico, depois o analisador sintático e, futuramente, as próximas etapas do compilador.
+
+A ideia para as próximas unidades é que as pastas que hoje funcionam como projetos separados passem a representar apenas módulos internos do projeto total. Com isso, o repositório poderá evoluir para ter um ponto de entrada global do compilador. Assim, no futuro, um `main` principal poderá coordenar todo o fluxo:
+
+```text
+.jack -> scanner -> parser -> compilation engine -> VM/code generator
+```
+
+Essa separação ajuda a testar e validar cada etapa isoladamente agora, sem impedir que `jack-lexical-analyzer`, `jack-syntactic-analyzer` e os próximos componentes sejam integrados depois como partes de um único compilador completo.
+
 ## Execução do módulo "Analisador Léxico"
 
 ### Pré-requisitos
