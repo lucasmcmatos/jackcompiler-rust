@@ -53,6 +53,32 @@ impl Keyword {
             _ => None,
         }
     }
+
+    pub fn as_str(&self) -> &str {
+        match self {
+            Keyword::Class => "class",
+            Keyword::Constructor => "constructor",
+            Keyword::Function => "function",
+            Keyword::Method => "method",
+            Keyword::Field => "field",
+            Keyword::Static => "static",
+            Keyword::Var => "var",
+            Keyword::Int => "int",
+            Keyword::Char => "char",
+            Keyword::Boolean => "boolean",
+            Keyword::Void => "void",
+            Keyword::True => "true",
+            Keyword::False => "false",
+            Keyword::Null => "null",
+            Keyword::This => "this",
+            Keyword::Let => "let",
+            Keyword::Do => "do",
+            Keyword::If => "if",
+            Keyword::Else => "else",
+            Keyword::While => "while",
+            Keyword::Return => "return",
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -86,6 +112,16 @@ impl TokenType {
             TokenType::StringConstant => "stringConstant",
         }
     }
+
+    pub fn description(&self) -> String {
+        match self {
+            TokenType::Keyword(keyword) => format!("keyword '{}'", keyword.as_str()),
+            TokenType::Symbol(symbol) => format!("symbol '{}'", symbol),
+            TokenType::Identifier => "identifier".to_string(),
+            TokenType::IntegerConstant => "integer constant".to_string(),
+            TokenType::StringConstant => "string constant".to_string(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -104,4 +140,11 @@ impl Token {
         }
     }
 
+    pub fn description(&self) -> String {
+        format!(
+            "{} com valor '{}'",
+            self.token_type.description(),
+            self.lexeme
+        )
+    }
 }

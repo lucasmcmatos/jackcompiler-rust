@@ -8,7 +8,7 @@ use crate::token::{Token, TokenType};
 
 pub fn read_tokens_from_file(path: &Path) -> Vec<Token> {
     let content = fs::read_to_string(path)
-        .expect("Erro ao ler arquivo de tokens XML");
+        .unwrap_or_else(|_| panic!("Erro ao ler arquivo de tokens XML: {}", path.display()));
 
     read_tokens_from_string(&content)
 }
@@ -31,22 +31,39 @@ pub fn read_tokens_from_string(content: &str) -> Vec<Token> {
 }
 
 fn parse_token_line(line: &str, line_number: usize) -> Token {
+    if !line.starts_with('<') {
+        panic!(
+            "Token XML inválido na linha {}: esperado tag inicial, encontrado '{}'",
+            line_number, line
+        );
+    }
+
     let start_tag_end = line
         .find('>')
-        .unwrap_or_else(|| panic!("Token XML inválido na linha {}", line_number));
+        .unwrap_or_else(|| panic!("Token XML inválido na linha {}: '{}'", line_number, line));
 
     let category = &line[1..start_tag_end];
     let close_tag = format!("</{}>", category);
 
     let close_tag_start = line
         .rfind(&close_tag)
-        .unwrap_or_else(|| panic!("Tag de fechamento inválida na linha {}", line_number));
+        .unwrap_or_else(|| {
+            panic!(
+                "Tag de fechamento inválida na linha {}: esperado '{}'",
+                line_number, close_tag
+            )
+        });
 
     let raw_lexeme = line[start_tag_end + 1..close_tag_start].trim();
     let lexeme = unescape_xml(raw_lexeme);
 
     let token_type = TokenType::from_xml_category(category, &lexeme)
-        .unwrap_or_else(|| panic!("Categoria de token inválida '{}' na linha {}", category, line_number));
+        .unwrap_or_else(|| {
+            panic!(
+                "Categoria de token inválida '{}' na linha {}",
+                category, line_number
+            )
+        });
 
     Token::new(token_type, lexeme, line_number)
 }

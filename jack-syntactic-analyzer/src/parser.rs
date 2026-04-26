@@ -280,7 +280,7 @@ impl Parser {
         self.compile_term();
 
         while self.is_op() {
-            let token = self.advance().unwrap();
+            let token = self.consume_current("operator");
             self.writer.write_token(&token);
             self.compile_term();
         }
@@ -446,7 +446,7 @@ impl Parser {
 
     fn match_symbol_and_write(&mut self, symbol: char) -> bool {
         if self.check_symbol(symbol) {
-            let token = self.advance().unwrap();
+            let token = self.consume_current(&format!("symbol '{}'", symbol));
             self.writer.write_token(&token);
             return true;
         }
@@ -456,15 +456,15 @@ impl Parser {
 
     fn consume_keyword(&mut self, keyword: Keyword) -> Token {
         if self.check_keyword(keyword.clone()) {
-            return self.advance().unwrap();
+            return self.consume_current(&format!("keyword '{}'", keyword.as_str()));
         }
 
-        self.syntax_error(&format!("keyword {:?}", keyword))
+        self.syntax_error(&format!("keyword '{}'", keyword.as_str()))
     }
 
     fn consume_symbol(&mut self, symbol: char) -> Token {
         if self.check_symbol(symbol) {
-            return self.advance().unwrap();
+            return self.consume_current(&format!("symbol '{}'", symbol));
         }
 
         self.syntax_error(&format!("symbol '{}'", symbol))
@@ -472,7 +472,7 @@ impl Parser {
 
     fn consume_identifier(&mut self) -> Token {
         if self.check_identifier() {
-            return self.advance().unwrap();
+            return self.consume_current("identifier");
         }
 
         self.syntax_error("identifier")
@@ -488,8 +488,13 @@ impl Parser {
     }
 
     fn consume_current_and_write(&mut self) {
-        let token = self.advance().unwrap();
+        let token = self.consume_current("token");
         self.writer.write_token(&token);
+    }
+
+    fn consume_current(&mut self, expected: &str) -> Token {
+        self.advance()
+            .unwrap_or_else(|| self.syntax_error(expected))
     }
 
     fn consume_keyword_and_write(&mut self, keyword: Keyword) {
@@ -510,8 +515,10 @@ impl Parser {
     fn syntax_error(&self, expected: &str) -> ! {
         match self.peek() {
             Some(token) => panic!(
-                "Erro sintático na linha {}: esperado {}, encontrado '{}'",
-                token.line, expected, token.lexeme
+                "Erro sintático na linha {}: esperado {}, encontrado {}.",
+                token.line,
+                expected,
+                token.description()
             ),
             None => panic!(
                 "Erro sintático no fim do arquivo: esperado {}",
