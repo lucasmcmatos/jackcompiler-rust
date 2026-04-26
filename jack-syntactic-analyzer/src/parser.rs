@@ -111,18 +111,58 @@ impl Parser {
         }
     }
 
-    // Esta função será completada na próxima etapa.
+    // parameterList: ((type varName) (',' type varName)*)?
     fn compile_parameter_list(&mut self) {
         self.writer.open_tag("parameterList");
+
+        if !self.check_symbol(')') {
+            self.compile_type();
+            self.consume_identifier_and_write();
+
+            while self.match_symbol_and_write(',') {
+                self.compile_type();
+                self.consume_identifier_and_write();
+            }
+        }
+
         self.writer.close_tag("parameterList");
     }
 
-    // Esta função será completada com varDec e statements na próxima etapa.
+    // subroutineBody: '{' varDec* statements '}'
     fn compile_subroutine_body(&mut self) {
         self.writer.open_tag("subroutineBody");
         self.consume_symbol_and_write('{');
+
+        while self.check_keyword(Keyword::Var) {
+            self.compile_var_dec();
+        }
+
+        self.compile_statements();
+
         self.consume_symbol_and_write('}');
         self.writer.close_tag("subroutineBody");
+    }
+
+    // varDec: 'var' type varName (',' varName)* ';'
+    fn compile_var_dec(&mut self) {
+        self.writer.open_tag("varDec");
+
+        self.consume_keyword_and_write(Keyword::Var);
+        self.compile_type();
+        self.consume_identifier_and_write();
+
+        while self.match_symbol_and_write(',') {
+            self.consume_identifier_and_write();
+        }
+
+        self.consume_symbol_and_write(';');
+        self.writer.close_tag("varDec");
+    }
+
+    // statements será preenchido com os comandos Jack na próxima etapa.
+    fn compile_statements(&mut self) {
+        self.writer.open_tag("statements");
+        self.writer.close_tag("statements");
     }
 
     // type: 'int' | 'char' | 'boolean' | className
