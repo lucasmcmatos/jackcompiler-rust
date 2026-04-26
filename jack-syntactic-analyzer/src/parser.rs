@@ -19,9 +19,15 @@ impl Parser {
         }
     }
 
-    // Ponto de entrada do parser. Nas próximas etapas, este método chamará
-    // compile_class(), que representa a regra inicial da gramática Jack.
+    // Ponto de entrada do parser.
+    // A regra inicial da linguagem Jack sempre é uma classe.
     pub fn parse(&mut self) -> String {
+        self.compile_class();
+
+        if !self.is_at_end() {
+            self.syntax_error("fim do arquivo");
+        }
+
         self.writer.content().to_string()
     }
 
