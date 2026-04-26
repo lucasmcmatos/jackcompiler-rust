@@ -159,10 +159,52 @@ impl Parser {
         self.writer.close_tag("varDec");
     }
 
-    // statements será preenchido com os comandos Jack na próxima etapa.
+    // statements: statement*
     fn compile_statements(&mut self) {
         self.writer.open_tag("statements");
+
+        while self.is_statement() {
+            self.compile_statement();
+        }
+
         self.writer.close_tag("statements");
+    }
+
+    fn compile_statement(&mut self) {
+        if self.check_keyword(Keyword::Let) {
+            self.compile_let();
+        } else if self.check_keyword(Keyword::If) {
+            self.compile_if();
+        } else if self.check_keyword(Keyword::While) {
+            self.compile_while();
+        } else if self.check_keyword(Keyword::Do) {
+            self.compile_do();
+        } else if self.check_keyword(Keyword::Return) {
+            self.compile_return();
+        } else {
+            self.syntax_error("statement");
+        }
+    }
+
+    // As funções abaixo serão implementadas nas próximas etapas.
+    fn compile_let(&mut self) {
+        panic!("letStatement ainda não implementado");
+    }
+
+    fn compile_if(&mut self) {
+        panic!("ifStatement ainda não implementado");
+    }
+
+    fn compile_while(&mut self) {
+        panic!("whileStatement ainda não implementado");
+    }
+
+    fn compile_do(&mut self) {
+        panic!("doStatement ainda não implementado");
+    }
+
+    fn compile_return(&mut self) {
+        panic!("returnStatement ainda não implementado");
     }
 
     // type: 'int' | 'char' | 'boolean' | className
@@ -225,6 +267,14 @@ impl Parser {
         self.check_keyword(Keyword::Constructor)
             || self.check_keyword(Keyword::Function)
             || self.check_keyword(Keyword::Method)
+    }
+
+    fn is_statement(&self) -> bool {
+        self.check_keyword(Keyword::Let)
+            || self.check_keyword(Keyword::If)
+            || self.check_keyword(Keyword::While)
+            || self.check_keyword(Keyword::Do)
+            || self.check_keyword(Keyword::Return)
     }
 
     fn match_keyword(&mut self, keyword: Keyword) -> bool {
